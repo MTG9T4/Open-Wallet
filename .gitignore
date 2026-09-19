@@ -1,0 +1,6 @@
+.state.json
+server.log
+server.pid
+nohup.out
+.DS_Store
+node_modules/

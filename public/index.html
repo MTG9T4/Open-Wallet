@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Open Wallet — Real-Time Wealth of the World's Richest People</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c9a227'/%3E%3Ctext x='32' y='43' font-size='26' font-weight='bold' text-anchor='middle' fill='%23fff' font-family='Georgia'%3EOW%3C/text%3E%3C/svg%3E" />
+  <meta name="description" content="Real-time net worth of the world's richest people — live prices every 15 seconds, bios, category lists, a race to $1 trillion, and a spend-the-fortune game." />
+  <meta property="og:title" content="Open Wallet — the world's richest people, live" />
+  <meta property="og:description" content="Watch the fortunes of the top 10 richest people move in real time. Bios, rankings, flips, and a spend-the-fortune game." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/og-banner.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">OW</div>
+      <div class="brand-text">
+        <div class="title">Open <span>Wallet</span></div>
+        <div class="subtitle">The real-time wealth of the world's richest people</div>
+      </div>
+      <span class="live-chip" id="live-chip"><span class="dot"></span>LIVE</span>
+      <span class="watch-chip" id="watch-chip"><span class="dot"></span><span id="watchers">…</span> watching</span>
+    </div>
+    <div class="search" id="search">
+      <input id="search-input" type="search" placeholder="Search people… (press /)" autocomplete="off" aria-label="Search people" />
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <div class="header-stats">
+      <div class="stat">
+        <span class="stat-label">Combined top 10</span>
+        <span class="stat-value" id="combined">—</span>
+        <span class="chip flat" id="combined-delta"></span>
+      </div>
+      <div class="stat right">
+        <span class="stat-label">Live prices</span>
+        <span class="stat-value small">updated <span id="updated">—</span></span>
+        <span class="stat-sub">next refresh in <span id="countdown">—</span><span id="market-status"></span></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="market-strip" id="market-strip"></div>
+
+  <div class="movers-wrap" id="movers-wrap">
+    <div class="movers" id="movers"></div>
+  </div>
+
+  <nav class="view-toggle" aria-label="Lists">
+    <button data-tab="top" class="active">Top 10 Richest</button>
+    <button data-tab="women">Richest Women</button>
+    <button data-tab="youngest">Youngest</button>
+    <button data-tab="athletes">Athletes</button>
+    <button data-tab="nontech">Non-Tech</button>
+    <button data-tab="bars">Wealth Chart</button>
+    <button id="theme-toggle" class="theme-btn" title="Switch between light and terminal (dark) mode">Terminal mode</button>
+  </nav>
+
+  <main>
+    <section id="view-list">
+      <div class="trillion-wrap" id="trillion-wrap" style="display:none">
+        <div class="tr-head">
+          <span class="tr-label">THE RACE TO $1 TRILLION</span>
+          <span class="tr-eta" id="tr-pace"></span>
+        </div>
+        <div class="tr-body">
+          <div class="avatar" id="tr-avatar"><span class="init"></span><img id="tr-img" alt=""></div>
+          <div class="tr-main">
+            <div class="tr-who"><b id="tr-name"></b><span class="tr-nw" id="tr-nw"></span></div>
+            <div class="tr-bar"><div class="tr-fill" id="tr-fill"></div></div>
+            <div class="tr-sub"><span id="tr-pct"></span> · <span id="tr-gap"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="table-head">
+        <span class="th-rank">#</span>
+        <span class="th-name">Name</span>
+        <span class="th-age">Age</span>
+        <span class="th-nw">Net worth</span>
+        <span class="th-change" id="th-change">Change since open</span>
+      </div>
+      <div class="legend">
+        <span><i class="lg-dot live"></i><b>Live</b> — priced from real stock quotes every 15s</span>
+        <span><i class="lg-dot est"></i><b>Estimate</b> — Forbes-style figure, not price-tracked</span>
+      </div>
+      <ol class="board" id="board"></ol>
+      <div class="flips-wrap" id="flips-wrap" style="display:none">
+        <div class="flips-title">Recent rank flips</div>
+        <ol class="flips" id="flips"></ol>
+      </div>
+    </section>
+    <section id="view-bars" hidden>
+      <div class="bars" id="bars"></div>
+    </section>
+    <p class="footnote">
+      Green-dot people are live-tracked: their public share stakes are re-priced from Google Finance
+      every 15 seconds on top of their Forbes 2026 baselines. Amber-dot people show Forbes-style
+      editorial estimates from March 2026 — their wealth sits in private holdings (brands, private
+      companies, inheritances) that have no live price feed. Tap any row for the detail view.
+      Photos: Wikimedia Commons (people and products; some have no free-license photo and appear as initials).
+      Figures are estimates for illustration — not official statements of wealth.
+    </p>
+  </main>
+
+  <div class="spend-layer" id="spend-layer" hidden>
+    <div class="spend-top">
+      <button class="spend-back" id="spend-back" aria-label="Back">← Back</button>
+      <div class="spend-person">
+        <div class="avatar" id="sp-avatar"><span class="init"></span><img id="sp-img" alt=""></div>
+        <div>
+          <div class="spend-name" id="sp-name"></div>
+          <div class="spend-fortune"><span id="sp-nw"></span><span class="live-flag live" id="sp-flag"></span></div>
+        </div>
+      </div>
+      <button class="spend-share" id="spend-share">Share result</button>
+    </div>
+    <div class="spend-budget">
+      <div class="spend-remaining" id="sp-remaining">—</div>
+      <div class="spend-meta"><span id="sp-spent"></span><span id="sp-pct"></span></div>
+      <div class="spend-bar"><div class="spend-fill" id="sp-fill"></div></div>
+    </div>
+    <div class="spend-grid" id="spend-grid"></div>
+    <div class="spend-foot">
+      <button id="spend-reset">Empty cart</button>
+      <span class="game-hint">prices are real-world MSRP / list prices · everything resells at full price</span>
+    </div>
+  </div>
+
+  <div class="backdrop" id="backdrop">
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-name">
+      <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+      <div class="modal-head">
+        <div class="avatar" id="m-avatar"></div>
+        <div class="modal-id">
+          <div class="modal-rank-row"><span class="modal-rank" id="m-rank"></span><span class="live-flag live" id="m-live-flag"></span></div>
+          <h2 class="modal-name" id="m-name"></h2>
+          <div class="modal-sub" id="m-sub"></div>
+        </div>
+      </div>
+      <p class="modal-bio" id="m-bio"></p>
+      <button class="spend-open-btn" id="m-spend-open">Spend It →</button>
+      <div class="modal-main" id="m-main">
+        <div class="nw-big" id="m-nw">—</div>
+        <div class="modal-chips">
+          <span class="chip flat" id="m-delta-open"></span>
+          <span class="chip flat" id="m-delta-base"></span>
+        </div>
+        <div class="rate-line" id="m-rate"></div>
+        <div class="fun-fact" id="m-fun">
+          <div id="m-fun-line"></div>
+          <div class="salary-row">
+            <label for="m-salary">Try your yearly salary: $</label>
+            <input id="m-salary" type="number" min="0" step="1000" value="50000" aria-label="Your yearly salary in dollars" />
+          </div>
+          <div class="earn-line" id="m-earn-line"></div>
+        </div>
+      </div>
+      <div class="chart-wrap" id="m-chart-wrap">
+        <div class="chart-head"><span>Net worth — live</span><span class="chart-note" id="m-chart-note"></span></div>
+        <canvas id="m-chart"></canvas>
+      </div>
+      <div class="holdings" id="m-holdings-wrap">
+        <h3>Where the money lives</h3>
+        <div id="m-holdings"></div>
+      </div>
+      <div class="stocks-wrap" id="m-stocks-wrap">
+        <h3>Live share prices</h3>
+        <div class="stocks" id="m-stocks"></div>
+      </div>
+      <div class="brk-wrap" id="m-brk-wrap" style="display:none">
+        <h3 id="m-brk-title">Berkshire's real portfolio</h3>
+        <div id="m-brk-rows"></div>
+        <p class="brk-note" id="m-brk-note"></p>
+      </div>
+      <div class="share-row">
+        <button id="m-share-x" title="Share on X">Share on X</button>
+        <button id="m-share-copy">Copy stats</button>
+      </div>
+      <p class="modal-note" id="m-note"></p>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <canvas id="confetti" class="confetti-canvas"></canvas>
+
+  <div class="loading" id="loading"><div class="spinner"></div><span>Connecting to live market data…</span></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
