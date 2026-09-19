@@ -526,7 +526,7 @@ function ensureRow(tab, p) {
       <div class="age-col"></div>
       <div class="wealth">
         <div class="nw"></div>
-        <div class="row-chips"><span class="chip flat delta"></span><span class="chip hint">details →</span><button class="spend-btn">Spend it</button></div>
+        <div class="row-chips"><span class="chip flat delta"></span><button class="spend-btn">Spend it</button></div>
       </div>`;
     const img = li.querySelector('.avatar img');
     img.addEventListener('error', () => img.remove());

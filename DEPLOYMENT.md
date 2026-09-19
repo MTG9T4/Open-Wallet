@@ -33,7 +33,41 @@ many instances against the same sources, and accept that a public unofficial sou
 change or block you at any time. The site already handles that gracefully (stale prices,
 DELAYED badge) — but don't build a business on uninterrupted supply.
 
-## Serving the frontend separately (Cloudflare Pages)
+## Option A: Cloudflare Tunnel (serve from your own machine)
+
+The fastest way to put the site on a real domain with zero hosting setup. Traffic flows
+`internet → Cloudflare edge → encrypted tunnel → localhost:3000`, with free HTTPS.
+
+```bash
+# one-time setup
+cloudflared tunnel login            # authorize your domain in the browser
+cloudflared tunnel create open-wallet
+cloudflared tunnel route dns open-wallet openwallet.fyi
+cloudflared tunnel route dns open-wallet www.openwallet.fyi
+```
+
+`~/.cloudflared/config.yml`:
+
+```yaml
+tunnel: <tunnel-id>
+credentials-file: /Users/<you>/.cloudflared/<tunnel-id>.json
+ingress:
+  - hostname: openwallet.fyi
+    service: http://localhost:3000
+  - hostname: www.openwallet.fyi
+    service: http://localhost:3000
+  - service: http_status:404
+```
+
+```bash
+# run it (keep the Node server running too)
+nohup cloudflared tunnel run open-wallet >> tunnel.log 2>&1 &
+```
+
+Caveat: the Mac must stay on, awake, and online — if it sleeps, the site goes down.
+For 24/7 uptime use Option B (a hosted server) instead.
+
+## Option B: split hosting
 
 The frontend is static. To host it apart from the server:
 

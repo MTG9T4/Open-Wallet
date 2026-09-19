@@ -316,7 +316,7 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 26px 70px; }
 
 .table-head {
   display: grid;
-  grid-template-columns: 48px 56px 1fr 60px 240px;
+  grid-template-columns: 48px 56px 1fr 60px 280px;
   gap: 16px;
   padding: 10px 18px 8px;
   font-size: 11px;
@@ -333,7 +333,7 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 26px 70px; }
 
 .row {
   display: grid;
-  grid-template-columns: 48px 56px 1fr 60px 240px;
+  grid-template-columns: 48px 56px 1fr 60px 280px;
   gap: 16px;
   align-items: center;
   padding: 14px 18px;

@@ -537,7 +537,7 @@ const byNw = (a, b) => b.netWorth - a.netWorth;
 const byAge = (a, b) => a.age - b.age;
 
 function rankList(arr, order, labelFn) {
-  const copy = arr.slice();
+  const copy = arr.map((r) => ({ ...r }));
   copy.sort(order);
   copy.forEach((r, i) => {
     r.rank = i + 1;
