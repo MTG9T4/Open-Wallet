@@ -498,11 +498,11 @@ function drawChart(canvas, pts, liveV) {
 function stockLine(p) {
   const bits = p.stocks.map((s) => {
     const px = s.price == null ? '—' : (s.currency === 'EUR' ? '€' : '$') + s.price.toLocaleString('en-US', { maximumFractionDigits: 2 });
-    const pct = s.priceDeltaPct == null ? '' : ' (' + (s.priceDeltaPct >= 0 ? '+' : '') + s.priceDeltaPct.toFixed(2) + '%)';
-    return `${s.ticker} ${px}${pct}`;
+    const pct = s.priceDeltaPct == null ? '' : `<span class="pct"> (${s.priceDeltaPct >= 0 ? '+' : ''}${s.priceDeltaPct.toFixed(2)}%)</span>`;
+    return `<span class="stk">${s.ticker} ${px}${pct}</span>`;
   });
   const other = (p.otherAssets >= 0 ? 'private $' : 'adjustments $') + p.otherAssets.toFixed(1) + 'B (est.)';
-  return bits.join(' · ') + ' · ' + other;
+  return bits.map((b) => b).join(' · ') + ' · <span class="stk">' + other + '</span>';
 }
 
 function ensureRow(tab, p) {
@@ -567,7 +567,7 @@ function updateRow(tab, li, p) {
   const stake = li.querySelector('.stake-line');
   if (tab === 'top' && p.stocks && p.stocks.length) {
     stake.className = 'stake-line';
-    stake.textContent = stockLine(p);
+    stake.innerHTML = stockLine(p);
   } else if (p.bio) {
     stake.className = 'stake-line bio';
     stake.textContent = p.bio;
@@ -1158,15 +1158,20 @@ setInterval(() => {
 
 const SPEND_ITEMS = [
   { id: 'coffee', name: 'Specialty coffee', price: 5, tag: 'typical' },
+  { id: 'bigmac', name: 'Big Mac meal', price: 5.79, tag: 'avg. US' },
   { id: 'movie', name: 'Movie ticket', price: 12.5, tag: 'avg. US' },
   { id: 'airpods', name: 'AirPods Pro', price: 249, tag: 'Apple MSRP' },
+  { id: 'switch2', name: 'Nintendo Switch 2', price: 449.99, tag: 'Nintendo MSRP' },
   { id: 'ps5', name: 'PlayStation 5 Pro', price: 749.99, tag: 'Sony MSRP' },
   { id: 'iphone', name: 'iPhone 18 Pro', price: 1099, tag: 'est.' },
+  { id: 'macbook', name: 'MacBook Pro 14', price: 1999, tag: 'Apple MSRP' },
   { id: 'rolex', name: 'Rolex Submariner Date', price: 10700, tag: 'retail est.' },
   { id: 'camry', name: 'Toyota Camry LE', price: 28700, tag: 'MSRP' },
   { id: 'model3', name: 'Tesla Model 3', price: 42490, tag: 'MSRP' },
+  { id: 'cybertruck', name: 'Tesla Cybertruck AWD', price: 79990, tag: 'Tesla MSRP' },
   { id: 'rangerover', name: 'Range Rover SE', price: 107900, tag: 'MSRP' },
   { id: 'huracan', name: 'Lamborghini Huracán EVO', price: 248295, tag: 'MSRP' },
+  { id: 'chiron', name: 'Bugatti Chiron', price: 3300000, tag: 'base MSRP' },
   { id: 'superbowl', name: '30-sec Super Bowl ad', price: 8000000, tag: '2025 rate' },
   { id: 'malibu', name: 'Malibu beach house', price: 12500000, tag: 'est.' },
   { id: 'falcon9', name: 'SpaceX Falcon 9 launch', price: 67000000, tag: 'SpaceX list' },

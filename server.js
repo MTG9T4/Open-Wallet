@@ -675,7 +675,7 @@ function sharePage(id, kind) {
       : `${p.name} — ${money} net worth, live on Open Wallet`;
   const desc =
     kind === 'spend'
-      ? `Take the spend-the-fortune challenge with ${p.name}'s ${money}: 18 real products, live math, share your time.`
+      ? `Take the spend-the-fortune challenge with ${p.name}'s ${money}: 23 real products, live math, share your time.`
       : `${p.name} (${p.source || 'billionaire'}) sits at ${money}. Live-moving estimates, honesty-labeled.`;
   let html;
   try {

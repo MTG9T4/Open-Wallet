@@ -36,7 +36,7 @@ State (charts, baselines, price history) persists across restarts via `.state.js
   would take you to earn that fortune, plus what you'd have earned since opening the page.
 - **Market status** — the header notes when prices are moving, flat, or it's a weekend.
 - **Try to spend it** — every person has a **Spend it** button (on their row and in their
-  detail window) opening a full spend layer: 18 real items with square product photos and
+  detail window) opening a full spend layer: 23 real items with square product photos and
   real-world MSRP / list prices — PS5 Pro ($749.99 Sony MSRP), iPhone 18 Pro, Toyota Camry,
   Range Rover, Rolex, Lamborghini, Super Bowl ad, Malibu beach house, Falcon 9 launch,
   Gulfstream G700, superyacht, Salvator Mundi, NFL team, Twitter. Add to cart, see live
