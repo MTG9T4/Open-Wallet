@@ -903,7 +903,7 @@ function switchTab(tab) {
   document.getElementById('view-list').hidden = isBars;
   document.getElementById('view-bars').hidden = !isBars;
   els.moversWrap.style.display = tab === 'top' ? '' : 'none';
-  els.thChange.textContent = tab === 'top' || tab === 'women' ? 'Change since open' : 'Notes';
+  els.thChange.textContent = tab === 'top' || tab === 'women' ? 'Net worth · change' : 'Net worth · notes';
   if (!isBars) {
     els.board.innerHTML = '';
     rowEls.clear();
@@ -1153,7 +1153,7 @@ try {
 setInterval(() => {
   if (!state.data || !state.data.nextPollAt) return;
   const ms = state.data.nextPollAt - Date.now();
-  els.countdown.textContent = ms <= 0 ? 'refreshing…' : Math.ceil(ms / 1000) + 's';
+  els.countdown.textContent = ms <= 0 ? '0s' : Math.ceil(ms / 1000) + 's';
 }, 250);
 
 const SPEND_ITEMS = [

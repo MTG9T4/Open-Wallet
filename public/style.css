@@ -327,7 +327,9 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 26px 70px; }
   border-bottom: 2px solid #e9eaee;
 }
 
-.th-nw, .th-change { grid-column: span 1; }
+.th-name { grid-column: 2 / 4; }
+.th-age { grid-column: 4; }
+.th-change { grid-column: 5; white-space: nowrap; }
 
 /* ---------- rows ---------- */
 
@@ -389,8 +391,8 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 26px 70px; }
 
 .avatar-badge {
   position: absolute;
-  right: -2px;
-  bottom: -2px;
+  right: 3px;
+  bottom: 3px;
   width: 12px;
   height: 12px;
   border-radius: 50%;
@@ -1216,6 +1218,7 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 26px 70px; }
 
   .table-head { grid-template-columns: 34px 48px 1fr 170px; }
   .th-age { display: none; }
+  .th-change { grid-column: 4; }
 
   .row { grid-template-columns: 34px 48px 1fr 170px; gap: 12px; padding: 12px 10px; }
   .avatar { width: 48px; height: 48px; }
