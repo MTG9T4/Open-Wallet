@@ -127,7 +127,7 @@ function renderTrillion(data) {
   }
 
   const pts = data.history[top.id] || [];
-  let paceTxt = 'waiting for markets to move';
+  let paceTxt = isWeekend() ? 'markets closed — resumes Monday' : 'waiting for markets to move';
   if (pts.length >= 4) {
     const t0 = pts[0].t;
     const t1 = pts[pts.length - 1].t;
@@ -501,7 +501,7 @@ function stockLine(p) {
     const pct = s.priceDeltaPct == null ? '' : ' (' + (s.priceDeltaPct >= 0 ? '+' : '') + s.priceDeltaPct.toFixed(2) + '%)';
     return `${s.ticker} ${px}${pct}`;
   });
-  const other = p.otherAssets >= 0 ? 'other $' + p.otherAssets.toFixed(1) + 'B' : 'adjustments $' + p.otherAssets.toFixed(1) + 'B';
+  const other = (p.otherAssets >= 0 ? 'private $' : 'adjustments $') + p.otherAssets.toFixed(1) + 'B (est.)';
   return bits.join(' · ') + ' · ' + other;
 }
 
@@ -604,7 +604,9 @@ function renderMovers(data) {
   const top = sorted[0];
   const bottom = sorted[sorted.length - 1];
   if (!top || Math.abs(top.deltaBase) < 0.0005) {
-    els.movers.innerHTML = '<span>Markets quiet since open — no movers yet. Prices update every 15 seconds.</span>';
+    els.movers.innerHTML = isWeekend()
+      ? '<span>Weekend — markets closed. Showing last close; live ticking resumes Monday.</span>'
+      : '<span>Markets quiet since open — no movers yet. Prices update every 15 seconds.</span>';
     return;
   }
   let html = `<span>Biggest gainer: <b>${top.name}</b> <span class="chip ${deltaClass(top.deltaBase)}">${arrowSigned(top.deltaBase)}</span></span>`;
@@ -938,7 +940,11 @@ function render(data) {
   renderTrillion(data);
   renderFlips(data);
 
-  if (data.viewers != null) els.watchers.textContent = data.viewers;
+  if (data.viewers != null) {
+    els.watchers.textContent = data.viewers;
+    const chip = document.getElementById('watch-chip');
+    if (chip) chip.style.display = data.viewers >= 10 ? '' : 'none';
+  }
 
   const top = data.people[0];
   if (top) {
@@ -992,14 +998,18 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+function isWeekend() {
+  const day = new Date().getDay();
+  return day === 0 || day === 6;
+}
+
 function updateMarketStatus() {
   if (!state.data) {
     els.marketStatus.textContent = '';
     return;
   }
-  const day = new Date().getDay();
-  if (day === 0 || day === 6) {
-    els.marketStatus.textContent = ' · weekend — markets closed';
+  if (isWeekend()) {
+    els.marketStatus.textContent = ' · weekend — markets closed, showing last close';
     return;
   }
   const moving = state.data.people.some((p) => p.stocks && p.stocks.some((s) => Math.abs(s.priceDeltaPct || 0) > 0.005));
