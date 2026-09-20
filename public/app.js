@@ -83,6 +83,11 @@ const els = {
 const milestones = new Map();
 const MILESTONE_PCTS = [0.5, 1, 2, 5];
 
+// Mobile trims: shorter table header + no desktop-only search hint.
+const NARROW = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 760px)').matches;
+const labelMain = NARROW ? 'Net worth' : 'Net worth · change';
+const labelNotes = NARROW ? 'Net worth' : 'Net worth · notes';
+
 function checkMilestones(data) {
   for (const p of data.people) {
     if (!p.live || !p.base) continue;
@@ -903,7 +908,7 @@ function switchTab(tab) {
   document.getElementById('view-list').hidden = isBars;
   document.getElementById('view-bars').hidden = !isBars;
   els.moversWrap.style.display = tab === 'top' ? '' : 'none';
-  els.thChange.textContent = tab === 'top' || tab === 'women' ? 'Net worth · change' : 'Net worth · notes';
+  els.thChange.textContent = tab === 'top' || tab === 'women' ? labelMain : labelNotes;
   if (!isBars) {
     els.board.innerHTML = '';
     rowEls.clear();
@@ -1366,3 +1371,7 @@ setInterval(poll, 2500);
 setInterval(pingViewers, 15000);
 pingViewers();
 poll();
+
+// Mobile: search placeholder without the desktop "/" hint (set above via NARROW).
+if (NARROW && els.searchInput) els.searchInput.placeholder = 'Search people…';
+if (NARROW && els.thChange) els.thChange.textContent = labelMain;
