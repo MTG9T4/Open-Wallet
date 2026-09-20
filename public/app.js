@@ -962,11 +962,18 @@ function render(data) {
 
   if (!state.hashChecked) {
     state.hashChecked = true;
-    const h = location.hash.slice(1);
-    if (h.startsWith('spend-')) {
-      const sid = h.slice(6);
-      if (sid && locate(sid)) openSpend(sid);
-    } else if (h && locate(h)) openModal(h);
+    const qs = new URLSearchParams(location.search);
+    const qSpend = qs.get('spend');
+    const qPerson = qs.get('person');
+    if (qSpend && locate(qSpend)) openSpend(qSpend);
+    else if (qPerson && locate(qPerson)) openModal(qPerson);
+    else {
+      const h = location.hash.slice(1);
+      if (h.startsWith('spend-')) {
+        const sid = h.slice(6);
+        if (sid && locate(sid)) openSpend(sid);
+      } else if (h && locate(h)) openModal(h);
+    }
   }
 
   if (spendState.personId) updateSpendValues();
@@ -1309,7 +1316,7 @@ els.spendShare.addEventListener('click', () => {
   if (!loc) return;
   const p = loc.p;
   const secs = Math.max(1, Math.round((Date.now() - spendState.startAt) / 1000));
-  const text = `I just spent ${fmtPrice(spendState.spent)} of ${p.name}'s ${fmtMoney(p.netWorth)} fortune in ${secs}s — try it: ${location.origin}/#spend-${p.id}`;
+  const text = `I just spent ${fmtPrice(spendState.spent)} of ${p.name}'s ${fmtMoney(p.netWorth)} fortune in ${secs}s — try it: ${location.origin}/?spend=${p.id}`;
   (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
     .then(() => toast('Copied!', text))
     .catch(() => toast('Copy failed', 'Select and copy manually'));
@@ -1328,10 +1335,11 @@ window.addEventListener('hashchange', () => {
 function shareText(p) {
   const openV = state.openVals.get(p.id);
   const dOpen = openV != null ? p.netWorth - openV : null;
+  const link = ` ${location.origin}/?person=${p.id}`;
   if (p.live && dOpen != null && Math.abs(dOpen) >= 0.001) {
-    return `${p.name} is ${fmtSigned(dOpen)} since I opened this page, sitting at ${fmtMoney(p.netWorth)} — watching it live on Open Wallet`;
+    return `${p.name} is ${fmtSigned(dOpen)} since I opened this page, sitting at ${fmtMoney(p.netWorth)} — watching it live on Open Wallet` + link;
   }
-  return `${p.name} — ${fmtMoney(p.netWorth)} net worth, #${p.rank} on the live list — Open Wallet`;
+  return `${p.name} — ${fmtMoney(p.netWorth)} net worth, #${p.rank} on the live list — Open Wallet` + link;
 }
 
 els.mShareX.addEventListener('click', () => {

@@ -653,6 +653,42 @@ async function pollLoop() {
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const MIME = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.ico': 'image/x-icon' };
 
+const CRAWLER_RE = /twitterbot|facebookexternalhit|linkedinbot|slackbot|discordbot|telegrambot|whatsapp/i;
+
+function escHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Dynamic unfurl cards for shared deep links (/?person=<id>, /?spend=<id>).
+// Fragments (#spend-x) never reach the server, so shares use query links;
+// crawlers get index.html with per-person title/description. Normal users
+// are never served this branch.
+function sharePage(id, kind) {
+  const snap = snapshot();
+  const all = [...snap.people, ...Object.values(snap.lists || {}).flat()];
+  const p = all.find((r) => r && r.id === id);
+  if (!p) return null;
+  const money = '$' + Number(p.netWorth).toFixed(1) + 'B';
+  const title =
+    kind === 'spend'
+      ? `Can you spend ${p.name}'s ${money} fortune? — Open Wallet`
+      : `${p.name} — ${money} net worth, live on Open Wallet`;
+  const desc =
+    kind === 'spend'
+      ? `Take the spend-the-fortune challenge with ${p.name}'s ${money}: 18 real products, live math, share your time.`
+      : `${p.name} (${p.source || 'billionaire'}) sits at ${money}. Live-moving estimates, honesty-labeled.`;
+  let html;
+  try {
+    html = fs.readFileSync(path.join(PUBLIC_DIR, 'index.html'), 'utf8');
+  } catch (e) {
+    return null;
+  }
+  html = html.replace(/<title>[^<]*<\/title>/, `<title>${escHtml(title)}</title>`);
+  html = html.replace(/(<meta property="og:title" content=")[^"]*(" \/>)/, `$1${escHtml(title)}$2`);
+  html = html.replace(/(<meta property="og:description" content=")[^"]*(" \/>)/, `$1${escHtml(desc)}$2`);
+  return html;
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   if (url.pathname === '/api/data') {
@@ -677,6 +713,19 @@ const server = http.createServer((req, res) => {
     res.writeHead(204);
     res.end();
     return;
+  }
+  if (url.pathname === '/') {
+    const kind = url.searchParams.has('spend') ? 'spend' : url.searchParams.has('person') ? 'person' : null;
+    const ua = req.headers['user-agent'] || '';
+    if (kind && CRAWLER_RE.test(ua)) {
+      const id = (url.searchParams.get(kind) || '').slice(0, 64);
+      const page = sharePage(id, kind);
+      if (page) {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+        res.end(page);
+        return;
+      }
+    }
   }
   const file = url.pathname === '/' ? '/index.html' : url.pathname;
   const full = path.normalize(path.join(PUBLIC_DIR, file));
